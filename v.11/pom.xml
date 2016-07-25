@@ -259,7 +259,16 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.1</version>
+                    <version>3.6</version>
+					<executions>
+					 <execution>
+					  <goals>
+					   <goal>check</goal>
+					   <goal>cpd-check</goal>
+					  </goals>
+					 </execution>
+					</executions>
+
                 </plugin>
             </plugins>
         </pluginManagement>
