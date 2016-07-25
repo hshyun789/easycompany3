@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:egov-security="http://www.egovframe.go.kr/schema/egov-security"
+    xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.egovframe.go.kr/schema/egov-security http://www.egovframe.go.kr/schema/egov-security/egov-security-3.0.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+    <!-- loaded by 'EgovSecurityConfigInitializerBeanDefinitionParser' BeanDefinitionParser  -->
+    <!-- import resource="classpath*:/META-INF/spring/security/security-*.xml" /-->
+
+    <security:http pattern="/css/**" security="none"/>
+    <security:http pattern="/images/**" security="none"/>
+    <security:http pattern="/js/**" security="none"/>
+    <security:http pattern="\A/WEB-INF/jsp/.*\Z" request-matcher="regex" security="none"/>
+
+    <egov-security:config id="securityConfig"
+        loginUrl="/uat/uia/actionSecurityLogin.do"
+        logoutSuccessUrl="/uat/uia/actionMain.do"
+        loginFailureUrl="/uat/uia/actionSecurityLogin.do?login_error=1"
+        accessDeniedUrl="/sec/ram/accessDenied.do"
+
+        dataSource="dataSource"
+        jdbcUsersByUsernameQuery="SELECT USER_ID, ESNTL_ID AS PASSWORD, 1 ENABLED, USER_NM, USER_ZIP, USER_ADRES, USER_EMAIL, USER_SE,  '-' ORGNZT_ID, ESNTL_ID, '-' ORGNZT_NM FROM COMVNUSERMASTER WHERE CONCAT(USER_SE, USER_ID) = ?"
+        jdbcAuthoritiesByUsernameQuery="SELECT A.SCRTY_DTRMN_TRGET_ID USER_ID, A.AUTHOR_CODE AUTHORITY FROM LETTNEMPLYRSCRTYESTBS A, COMVNUSERMASTER B WHERE A.SCRTY_DTRMN_TRGET_ID = B.ESNTL_ID AND B.USER_ID = ?"
+        jdbcMapClass="egovframework.let.uat.uia.service.impl.EgovSessionMapping"
+
+        requestMatcherType="regex"
+        hash="plaintext"
+
+    />
+
+    <egov-security:initializer id="initializer"
+        supportPointcut="false"
+        supportMethod="false"
+    />
+
+    <egov-security:secured-object-config id="securedObjectConfig"
+       sqlRolesAndUrl="SELECT a.ROLE_PTTRN url, b.AUTHOR_CODE authority FROM LETTNROLEINFO a, LETTNAUTHORROLERELATE b  WHERE a.ROLE_CODE = b.ROLE_CODE AND a.ROLE_TY = 'url'  ORDER BY a.ROLE_SORT"
+       sqlRolesAndMethod="SELECT a.ROLE_PTTRN &quot;method&quot;, b.AUTHOR_CODE authority FROM LETTNROLEINFO a, LETTNAUTHORROLERELATE b WHERE a.ROLE_CODE = b.ROLE_CODE AND a.ROLE_TY = 'method'  ORDER BY a.ROLE_SORT"
+       sqlRolesAndPointcut="SELECT a.ROLE_PTTRN pointcut, b.AUTHOR_CODE authority FROM LETTNROLEINFO a, LETTNAUTHORROLERELATE b WHERE a.ROLE_CODE = b.ROLE_CODE AND a.ROLE_TY = 'pointcut'  ORDER BY a.ROLE_SORT"
+
+       sqlRegexMatchedRequestMapping="SELECT a.resource_pattern uri, b.authority authority FROM LETTNSECURED_RESOURCES a, LETTNSECURED_RESOURCES_ROLE b WHERE a.resource_id = b.resource_id AND a.resource_type = 'url'"
+       sqlHierarchicalRoles="SELECT a.CHLDRN_ROLE child, a.PARNTS_ROLE parent FROM LETTNROLES_HIERARCHY a LEFT JOIN LETTNROLES_HIERARCHY b on (a.CHLDRN_ROLE = b.PARNTS_ROLE)"
+    />
+
+</beans>
